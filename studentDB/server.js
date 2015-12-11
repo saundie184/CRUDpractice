@@ -8,6 +8,7 @@ var url = require('url');
 var Monk = require('monk');
 var db = Monk('localhost/studentDirectory');
 var students = db.get('students');
+var companies = db.get('companies');
 
 var server = http.createServer(handleRequest);
 // start the server on port 8000
@@ -85,7 +86,65 @@ function handleRequest(req, res) {
       }
       res.setHeader('Content-Type', 'text/html');
       res.statusCode = 200;
-      res.write('Successfully deleted');
+      res.write('Student successfully deleted');
+      res.end();
+    });
+  } else if (req.url === '/companies') {
+    companies.find({}, function(err, data) {
+      if (err) throw err;
+      res.setHeader('Content-Type', 'text/html');
+      res.statusCode = 200;
+      res.write(JSON.stringify(data));
+      res.end();
+    });
+  } else if (pathname === '/companies/create') {
+    // insert info dynamically from text fields
+    // what we are parsing
+    // /create?firstname=Ian&lastname=Smith&favLang=javascript
+
+    companies.insert(query, function(err, data) {
+      if (err) {
+        throw err;
+      }
+      res.setHeader('Content-Type', 'text/html');
+      res.statusCode = 200;
+      res.write(JSON.stringify(data));
+      res.end();
+    });
+
+  } else if (pathname === '/companies/update') {
+    // console.log(query);
+    var keyArray = Object.keys(query);
+    var searchId = query[keyArray[0]];
+    // console.log(searchId);
+    var changeObj = {};
+    for (var i = 1; i < keyArray.length; i++) {
+      changeObj[keyArray[i]] = query[keyArray[i]];
+    }
+    // console.log(changeObj);
+
+    companies.update({
+      '_id': searchId
+    }, {
+      //pass in object with the updated key values
+      $set: changeObj
+    }, function(err, data) {
+      if (err) throw err;
+      res.setHeader('Content-Type', 'text/html');
+      res.statusCode = 200;
+      res.write('Successfully updated!');
+      res.end();
+    });
+
+
+  } else if (pathname === '/companies/delete') {
+    companies.remove(query, function(err, data) {
+      if (err) {
+        throw err;
+      }
+      res.setHeader('Content-Type', 'text/html');
+      res.statusCode = 200;
+      res.write('Company successfully deleted');
       res.end();
     });
   } else {
