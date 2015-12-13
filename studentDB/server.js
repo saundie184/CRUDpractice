@@ -142,7 +142,7 @@ function handleRequest(req, res) {
       res.end();
     });
 
-  } else if (pathname === '/languages') {
+  } else if (pathname === '/language') {
     // Have a route for each programming language that shows the students and
     // companies who match the programming language. This route should dynamically
     // take the language to allow any possibilities added in the future.
@@ -179,6 +179,6 @@ function handleRequest(req, res) {
 function respondError(req, res) {
   res.setHeader('Content-Type', 'text/html');
   res.statusCode = 404;
-  res.write('Error 404; File cannot be found');
+  res.write('<h1>Error 404: File cannot be found</h1>');
   res.end();
 }
