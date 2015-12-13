@@ -171,6 +171,40 @@ function handleRequest(req, res) {
       res.end();
     });
 
+  } else if (pathname === '/students/show') {
+
+    var keyArray = Object.keys(query);
+    var searchObj = {};
+    for (var i = 0; i < keyArray.length; i++) {
+      searchObj[keyArray[i]] = query[keyArray[i]];
+    }
+
+    students.find(searchObj, function (err, data){
+      if (err) {
+        throw err;
+      }
+      res.setHeader('Content-Type', 'text/html');
+      res.statusCode = 200;
+      res.write(JSON.stringify(data));
+    });
+
+  } else if (pathname === '/companies/show') {
+
+    var keyArray = Object.keys(query);
+    var searchObj = {};
+    for (var i = 0; i < keyArray.length; i++) {
+      searchObj[keyArray[i]] = query[keyArray[i]];
+    }
+
+    companies.find(searchObj, function (err, data){
+      if (err) {
+        throw err;
+      }
+      res.setHeader('Content-Type', 'text/html');
+      res.statusCode = 200;
+      res.write(JSON.stringify(data));
+    });
+
   } else {
     respondError(req, res);
   }
