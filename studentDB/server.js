@@ -4,7 +4,10 @@ var fs = require('fs');
 var http = require('http');
 var url = require('url');
 var Monk = require('monk');
+var app = require('./app');
 var db = Monk('localhost/studentDirectory');
+var app = require('./app');
+
 var students = db.get('students');
 var companies = db.get('companies');
 
@@ -16,9 +19,9 @@ server.listen(8000, function() {
 
 function handleRequest(req, res) {
   // get pathname and query string from req.url
-  var data = url.parse(req.url, true);
-  var query = data.query;
-  var pathname = data.pathname;
+  var urlObj = url.parse(req.url, true);
+  var query = urlObj.query;
+  var pathname = urlObj.pathname;
 
   if (pathname === '/students') {
 
@@ -26,10 +29,13 @@ function handleRequest(req, res) {
       if (err) {
         throw err;
       }
+      // fetchFile(req, res, './students.html');
       res.setHeader('Content-Type', 'text/html');
       res.statusCode = 200;
+      console.log(data);
       res.write(JSON.stringify(data));
       res.end();
+
     });
 
   } else if (pathname === '/students/create') {
@@ -207,6 +213,30 @@ function handleRequest(req, res) {
 
   } else {
     respondError(req, res);
+  }
+}
+
+function fetchFile(req, res, filename){
+  fs.readFile(filename, function(err, docs){
+    if (err) {
+      res.statusCode = 500;
+      res.write('We screwed up!');
+      res.end();
+    }
+    handleFileLoad(req, res, err, docs);
+  });
+}
+
+function handleFileLoad(req, res, err, docs){
+  if (err) {
+    res.statusCode = 500;
+    res.write('We screwed up!');
+    res.end();
+  } else {
+    res.setHeader('Content-Type', 'text/html');
+    res.statusCode = 200;
+    res.write(docs.toString());
+    res.end();
   }
 }
 
